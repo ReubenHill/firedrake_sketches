@@ -30,8 +30,8 @@ zeroform = f*dx
 #            functions to execute to make this happen being yielded by 
 #            assemble._assemble
 #   - 2. the loops are called to yield the final result - here a real number.
-assembled = assemble(zeroform) 
-assert np.isclose(assembled, 1.)
+number = assemble(zeroform) 
+assert np.isclose(number, 1.)
 
 # Now consider a linear variational problem within a finite element 
 # function space V: find u in V such that a(u,v) = F(v) where v is in V.
@@ -55,11 +55,11 @@ v = TestFunction(V)
 oneform = v*dx
 # Assemble works as for the 0-form but with the final result being the 
 # rank 1 tensor `F(\phi_i)` where i = 1, ..., n.
-assembled = assemble(oneform)
+assembled_rhs_vector = assemble(oneform)
 # Note that in Firedrake, we reuse the `Function` type to store each 
 # `F(\phi_i)` where we usually store the basis coefficient u_i 
 # corresponding to basis function `\phi_i`.
-print(type(assembled))
+print(type(assembled_rhs_vector))
 
 # Next lets look at the bilinear form a(u,v).
 # `TrialFunction` also constructs a special case of a UFL `Argument`
@@ -72,7 +72,19 @@ u = TrialFunction(V)
 twoform = v*u*dx
 # Assemble again works as for the 0-form but with the final result being
 # the rank 2 tensor `a(\phi_i, \phi_j)` where i = 1, ..., n and j = 1, ..., n
-assembled = assemble(twoform)
+assembled_lhs_matrix = assemble(twoform)
 # Assembled matrices are saved in their own `Matrix` type.
-print(type(assembled))
+print(type(assembled_lhs_matrix))
 
+# let's solve the linear system, placing our solution into a newly made 
+# `Function` x 
+A = assembled_lhs_matrix
+x = Function(V)
+b = assembled_rhs_vector
+solver = LinearSolver(A)
+solver.solve(x, b)
+u = x
+# Note that the linear variation problem we solved has solution u = 1.
+# Let's see how good our solution is:
+plot(u)
+plt.show()
