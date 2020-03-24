@@ -14,7 +14,7 @@ def PointCloudSwarm(mesh, points, comm=COMM_WORLD):
     if pdim != tdim:
         raise ValueError(f"Mesh topological dimension {tdim} must match point list dimension {pdim}")
 
-    # Create a DMSWARM 
+    # Create a DMSWARM
     swarm = PETSc.DMSwarm().create(comm=comm)
 
     # Set swarm DM dimension to match mesh dimension
@@ -29,8 +29,8 @@ def PointCloudSwarm(mesh, points, comm=COMM_WORLD):
     # Set to Particle In Cell (PIC) type
     swarm.setType(PETSc.DMSwarm.Type.PIC)
 
-    # Setup particle information as though there is a field associated 
-    # with the points, but don't actually register any fields. 
+    # Setup particle information as though there is a field associated
+    # with the points, but don't actually register any fields.
     # An example of setting a field is left for reference.
     # blocksize = 1
     # swarm.registerField("somefield", blocksize)
