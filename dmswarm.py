@@ -16,17 +16,31 @@ def PointCloud(mesh, points, comm=COMM_WORLD):
 
     # Create a DMSWARM 
     swarm = PETSc.DMSwarm().create(comm=comm)
-    swarm.setCoordinateDim(pdim)
 
-    # Set to Particle In Cell (PIC) type
-    swarm.setType(1)
+    # Set swarm DM dimension to match mesh dimension
+    swarm.setDimension(mesh._plex.getDimension())
+
+    # Set coordinates dimension
+    swarm.setCoordinateDim(pdim)
 
     # Link to mesh information for when swarm.migrate() is used
     swarm.setCellDM(mesh._plex)
 
+    # Set to Particle In Cell (PIC) type
+    swarm.setType(PETSc.DMSwarm.Type.PIC)
+
+    # START TEMPORARY
+
+    # Setup particle information
+    # blocksize = 0
+    # swarm.registerField("tempfield", blocksize)
+    swarm.finalizeFieldRegister() # required to set point coordinates
+
+    # END TEMPORARY
+
     # Add point coordinates - note we set redundant mode to true which forces
     # all ranks to search for the points within their cell
-    swarm.setPointCoordinates(points, redundant=True, mode=PETSc.InsertMode.INSERT_VALUES)
+    swarm.setPointCoordinates(points, redundant=False, mode=PETSc.InsertMode.INSERT_VALUES)
 
 
 mesh = UnitSquareMesh(5,5)
