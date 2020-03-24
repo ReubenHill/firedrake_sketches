@@ -3,7 +3,7 @@ from firedrake.petsc import PETSc, OptionsManager
 
 from firedrake import *
 
-def PointCloud(mesh, points, comm=COMM_WORLD):
+def PointCloudSwarm(mesh, points, comm=COMM_WORLD):
     """
     Create a point cloud mesh (vertex only mesh) from a mesh and set of points.
     """
@@ -29,22 +29,31 @@ def PointCloud(mesh, points, comm=COMM_WORLD):
     # Set to Particle In Cell (PIC) type
     swarm.setType(PETSc.DMSwarm.Type.PIC)
 
-    # START TEMPORARY
+    # Setup particle information as though there is a field associated 
+    # with the points, but don't actually register any fields. 
+    # An example of setting a field is left for reference.
+    # blocksize = 1
+    # swarm.registerField("somefield", blocksize)
+    swarm.finalizeFieldRegister()
 
-    # Setup particle information
-    # blocksize = 0
-    # swarm.registerField("tempfield", blocksize)
-    swarm.finalizeFieldRegister() # required to set point coordinates
+    # Note that no new fields can now be associated with the DMSWARM.
 
-    # END TEMPORARY
-
-    # Add point coordinates - note we set redundant mode to true which forces
-    # all ranks to search for the points within their cell
+    # Add point coordinates - note we set redundant mode to False since
+    # all ranks are given the same list of points. This forces all ranks
+    # to search for the points within their cell.
     swarm.setPointCoordinates(points, redundant=False, mode=PETSc.InsertMode.INSERT_VALUES)
+
+    # # not clear if this needed when running on multiple MPI ranks?
+    # swarm.migrate()
+
+    return swarm
+
+
+
 
 
 mesh = UnitSquareMesh(5,5)
 V = FunctionSpace(mesh, 'CG', 1)
 points = [(.1, .1), (.2, .3), (.7, .8)]
-point_cloud = PointCloud(mesh, points)
+point_cloud_swarm = PointCloud(mesh, points)
 
