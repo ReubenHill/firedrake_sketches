@@ -55,5 +55,4 @@ def PointCloudSwarm(mesh, points, comm=COMM_WORLD):
 mesh = UnitSquareMesh(5,5)
 V = FunctionSpace(mesh, 'CG', 1)
 points = [(.1, .1), (.2, .3), (.7, .8)]
-point_cloud_swarm = PointCloud(mesh, points)
-
+point_cloud_swarm = PointCloudSwarm(mesh, points)
