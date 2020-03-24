@@ -52,7 +52,7 @@ def PointCloudSwarm(mesh, points, comm=COMM_WORLD):
 
 
 
-mesh = UnitSquareMesh(5,5)
-V = FunctionSpace(mesh, 'CG', 1)
+m = UnitSquareMesh(5,5)
+V = FunctionSpace(m, 'DG', 0)
 points = [(.1, .1), (.2, .3), (.7, .8)]
-point_cloud_swarm = PointCloudSwarm(mesh, points)
+point_cloud_swarm = PointCloudSwarm(m, points)
